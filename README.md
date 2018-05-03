@@ -23,7 +23,7 @@ Again, check to make sure the script's execution order is higher priority than a
 
 # Requisites
 
-I have hard coded a -990 delay for Auto scripts. All scripts using Auto must have a delay < 990.
+I have hard coded a -990 delay for Auto scripts. All scripts using Auto must have their script execution order delay < 990.
 The value can be changed by editing the arguments evertime [ScriptTimer(...)] is used.
 
 # Installation
