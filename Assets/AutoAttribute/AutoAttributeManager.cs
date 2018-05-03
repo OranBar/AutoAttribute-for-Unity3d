@@ -12,7 +12,6 @@
  * 
  * The Define DEB on top of the script can be commented out to remove console logs for performance.
  * 
- * Copyrights to Oran Bar™
  */
 
 using System;
@@ -54,10 +53,7 @@ public class AutoAttributeManager : MonoBehaviour
 			foreach (IAutoAttribute autofind in field.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
 				var currentReferenceValue = field.GetValue(targetMb);
-				// if (currentReferenceValue == null || currentReferenceValue.Equals(null))
-				// {
-					autofind.Execute(targetMb, field.FieldType, (mb, val)=>field.SetValue(mb, val));
-				// }
+				autofind.Execute(targetMb, field.FieldType, (mb, val)=>field.SetValue(mb, val));
 			}
 		}
 
@@ -69,10 +65,7 @@ public class AutoAttributeManager : MonoBehaviour
 			foreach (IAutoAttribute autofind in prop.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
 				var currentReferenceValue = prop.GetValue(targetMb, null);
-				// if (currentReferenceValue == null || currentReferenceValue.Equals(null))
-				// {
-					autofind.Execute(targetMb, prop.PropertyType, (mb, val)=>prop.SetValue(mb, val));
-				// }
+				autofind.Execute(targetMb, prop.PropertyType, (mb, val)=>prop.SetValue(mb, val));
 			}
 		}
 	}

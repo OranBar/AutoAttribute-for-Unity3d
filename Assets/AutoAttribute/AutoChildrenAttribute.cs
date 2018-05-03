@@ -12,8 +12,8 @@
  *		//Methods...
  * }
  * 
- * Copyrights to Oran Bar™
  */
+ 
 using System;
 using System.Collections.Generic;
 using System.Linq;

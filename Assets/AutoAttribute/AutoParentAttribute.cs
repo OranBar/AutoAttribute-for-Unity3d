@@ -12,7 +12,6 @@
  *		//Methods...
  * }
  * 
- * Copyrights to Oran Bar™
  */
 
 using System;

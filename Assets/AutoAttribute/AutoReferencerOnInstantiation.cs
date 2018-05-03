@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿/* Author: Oran Bar
+ * Summary: If the instantiated object has this script prior to its instantiation, auto will reference all variables of attached components correctly. 
+ */
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Auto.Utils;
