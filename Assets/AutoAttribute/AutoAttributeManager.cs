@@ -24,26 +24,8 @@ using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;	
 using Auto.Utils;
 
-#if UNITY_EDITOR
-[UnityEditor.InitializeOnLoad]
-#endif
 public static class AutoAttributeManager 
 {
-
-	#if UNITY_EDITOR
-	static AutoAttributeManager()
-	{
-		UnityEditor.EditorApplication.playModeStateChanged += 
-			(playMode) => 
-			{ 
-				if(playMode == UnityEditor.PlayModeStateChange.ExitingEditMode)
-				{
-					SweeepScene();
-				}
-			};
-	}
-	#endif
-
 	public static void AutoReference(GameObject targetGo)
 	{
 		foreach(var mb in targetGo.GetComponents<MonoBehaviour>(true))
