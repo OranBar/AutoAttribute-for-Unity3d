@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using UnityEditor;
 
 namespace Auto.Utils{
@@ -33,3 +35,5 @@ namespace Auto.Utils{
 		
 	}
 }
+
+#endif

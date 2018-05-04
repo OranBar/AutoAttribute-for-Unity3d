@@ -21,19 +21,28 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
+using Debug = UnityEngine.Debug;	
 using Auto.Utils;
 
-[ScriptTiming(-1000)]
-public class AutoAttributeManager : MonoBehaviour
+#if UNITY_EDITOR
+[UnityEditor.InitializeOnLoad]
+#endif
+public static class AutoAttributeManager 
 {
 
-	private void Awake()
+	#if UNITY_EDITOR
+	static AutoAttributeManager()
 	{
-		print("[Auto]: Start Scene Sweep");
-		SweeepScene();
-		print("[Auto]: All Variables Referenced!");
+		UnityEditor.EditorApplication.playModeStateChanged += 
+			(playMode) => 
+			{ 
+				if(playMode == UnityEditor.PlayModeStateChange.ExitingEditMode)
+				{
+					SweeepScene();
+				}
+			};
 	}
+	#endif
 
 	public static void AutoReference(GameObject targetGo)
 	{
@@ -52,7 +61,7 @@ public class AutoAttributeManager : MonoBehaviour
 		{
 			foreach (IAutoAttribute autofind in field.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				var currentReferenceValue = field.GetValue(targetMb);
+				//var currentReferenceValue = field.GetValue(targetMb);
 				autofind.Execute(targetMb, field.FieldType, (mb, val)=>field.SetValue(mb, val));
 			}
 		}
@@ -64,16 +73,20 @@ public class AutoAttributeManager : MonoBehaviour
 		{
 			foreach (IAutoAttribute autofind in prop.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				var currentReferenceValue = prop.GetValue(targetMb, null);
+				//var currentReferenceValue = prop.GetValue(targetMb, null);
 				autofind.Execute(targetMb, prop.PropertyType, (mb, val)=>prop.SetValue(mb, val));
 			}
 		}
 	}
 
+#if UNITY_EDITOR
+	[UnityEditor.Callbacks.PostProcessSceneAttribute(0)]
+#endif
     public static void SweeepScene()
 	{
 #if DEB
 		//Debug
+		Debug.Log("[Auto]: Start Scene Sweep");
 		Stopwatch sw = new Stopwatch();
 
 		sw.Start();
@@ -109,6 +122,7 @@ public class AutoAttributeManager : MonoBehaviour
 		//Debug.Log("Elapsed "+sw.ElapsedMilliseconds+" milliseconds.");
 		Debug.LogFormat("[Auto] Scan Time - {3} Milliseconds. \nAnalized {0} MonoBehaviours and {1} variables. {2}/{1} variables had [Auto]", monoBehaviours.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds);
 		/////////////////////
+		Debug.Log("[Auto]: All Variables Referenced!");
 #endif
 	}
 

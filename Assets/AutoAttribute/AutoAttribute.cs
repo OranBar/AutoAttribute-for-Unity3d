@@ -24,7 +24,9 @@ public class AutoAttribute : Attribute, IAutoAttribute {
 
 	private const string MonoBehaviourNameColor = "green";
 
+	//TODO: Remove autoAdd. If you know you want it, place it yourself
 	private bool autoAdd = false;
+	//TODO: I'd say always log error if missing. Change this bool to haltBuildIfNull. Change LogError to Log if this bool is false
 	private bool logErrorIfMissing = true;
 
 	private Component targetComponent;
