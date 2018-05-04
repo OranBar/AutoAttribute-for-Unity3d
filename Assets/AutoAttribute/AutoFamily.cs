@@ -26,13 +26,13 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 	private const string MonoBehaviourNameColor = "green";
 	private static ReflectionHelperMethods Rhm = new ReflectionHelperMethods();
 
-	private bool logErrorIfMissing = true;
+	private bool haltBuildIfNull = true;
 
 	private Component targetComponent;
 
 	public AutoFamily(bool getMadIfMissing = true)
 	{
-		this.logErrorIfMissing = getMadIfMissing;
+		this.haltBuildIfNull = getMadIfMissing;
 	}
 
 	public void Execute(MonoBehaviour mb, Type componentType, Action<MonoBehaviour, object> SetVariableType)
@@ -73,16 +73,22 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 
 		if (componentsToReference.Length == 0)
 		{
-			if (logErrorIfMissing)
+			string errorMessage = string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find any components <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}.</color>",
+						componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor);
+
+			if (haltBuildIfNull)
 			{
-				Debug.LogError(
-					string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find any components <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}.</color>",
-						componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor)
-					, go);
+				//Logging an error during PostProcessScene halts the build.
+				Debug.LogError(errorMessage);
+			}
+			else
+			{
+				Debug.LogWarning("<color=red>"+errorMessage+"</color>");
 			}
 			return;
-		}
 
+		}
+			
 		if (componentType.IsArray)
 		{
 			SetVariable(mb, componentsToReference);

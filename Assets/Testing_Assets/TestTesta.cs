@@ -13,8 +13,8 @@ public class TestTesta : MonoBehaviour {
 	[Auto] public TestTesta mySelf;
 
 
-	void Start () {
-		
+	void Awake () {
+		firstCollider.isTrigger = true;
 	}
 	
 	// Update is called once per frame

@@ -24,21 +24,14 @@ public class AutoAttribute : Attribute, IAutoAttribute {
 
 	private const string MonoBehaviourNameColor = "green";
 
-	private bool autoAdd = false;
-	private bool logErrorIfMissing = true;
+	//TODO: I'd say always log error if missing. Change this bool to haltBuildIfNull. Change LogError to Log if this bool is false
+	private bool haltBuildIfNull = true;
 
 	private Component targetComponent;
 
-	public AutoAttribute(bool autoAdd)
+	public AutoAttribute(bool haltBuildIfNull = true)
 	{
-		this.autoAdd = autoAdd;
-		this.logErrorIfMissing = true;
-	}
-
-	public AutoAttribute(bool autoAdd = false, bool getMadIfMissing = true)
-	{
-		this.autoAdd = autoAdd;
-		this.logErrorIfMissing = getMadIfMissing;
+		this.haltBuildIfNull = haltBuildIfNull;
 	}
 
 	public void Execute(MonoBehaviour mb, Type componentType, Action<MonoBehaviour, object> SetVariableType)
@@ -48,24 +41,20 @@ public class AutoAttribute : Attribute, IAutoAttribute {
 		Component componentToReference = go.GetComponent(componentType);
 		if (componentToReference == null)
 		{
-			if (autoAdd)
+			string errorMessage = string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}</color>",
+						componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor);
+					
+			if (haltBuildIfNull)
 			{
-				Debug.LogWarning(string.Format("[Auto]: <color={3}><b>{1}</b></color> automatically added component <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{1}</color>",
-					componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor)
-					, go);
-				componentToReference = mb.gameObject.AddComponent(componentType);
+				//Logging an error during PostProcessScene halts the build.
+				Debug.LogError(errorMessage, mb);
 			}
 			else
 			{
-				if (logErrorIfMissing)
-				{
-					Debug.LogError(
-						string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}</color>",
-							componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor)
-						, go);
-				}
-				return;
+				Debug.LogWarning("<color=red>"+errorMessage+"</color>", mb);
 			}
+			
+			return;
 		}
 
 		SetVariableType(mb, componentToReference);
