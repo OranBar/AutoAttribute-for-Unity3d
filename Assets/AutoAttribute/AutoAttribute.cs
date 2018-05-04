@@ -51,7 +51,7 @@ public class AutoAttribute : Attribute, IAutoAttribute {
 			}
 			else
 			{
-				Debug.Log("<color=red>"+errorMessage+"</color>", mb);
+				Debug.LogWarning("<color=red>"+errorMessage+"</color>", mb);
 			}
 			
 			return;

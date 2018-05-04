@@ -83,7 +83,7 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 			}
 			else
 			{
-				Debug.Log("<color=red>"+errorMessage+"</color>");
+				Debug.LogWarning("<color=red>"+errorMessage+"</color>");
 			}
 			return;
 
