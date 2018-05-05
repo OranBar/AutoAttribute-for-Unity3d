@@ -9,7 +9,7 @@ public class TestTesta : MonoBehaviour {
 	[AutoChildren] public Collider[] allChildrenColliders_Arr;
 	[AutoChildren] public List<Collider> allChildrenColliders_List;
 	
-	[Auto] public Light myLight;
+	[Auto(false)] public Light myLight;
 	[Auto] public TestTesta mySelf;
 
 
