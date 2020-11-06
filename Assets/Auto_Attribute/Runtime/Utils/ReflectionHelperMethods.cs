@@ -53,10 +53,10 @@ namespace Auto.Utils{
 				.ToArray();
 
 			//Although it might sound like an incredible idea to ignore all properties, life is not so beautiful.... Unity's components only declare properties, and no fields. 
-			//Those properties are connected to the C++ side of things.... And because of that, they do not contain the info as fields.
-			//Because of this, it is essential to also get the properties. Else a Rigidbody or ConfigurableJoint will result having 0 variables.
-			//Also, we can take out all properties that can't be written or read. Nothing we can do about them. 
-			//Oh, and, last thing, the third where (rop.GetIndexParameters().Length == 0) is used to filder out indexers. I do not support them out of can't-be-bothered-itis
+			//Those properties are connected to the C++ side of things.... And they do not contain the info as fields.
+			//Because of this, it is essential to also get the properties. Else a Rigidbody or ConfigurableJoint will result in having 0 variables.
+			//Also, we can take out of the equation all properties that can't be written or read. Nothing we can do about them. 
+			//Oh, and, last thing, the third where (rop.GetIndexParameters().Length == 0) is used to filder out indexers. I do not support them, because never use them and couldn't be bothered
 			PropertyInfo[] componentProperties = objectType.GetProperties(/*BindingFlags.NonPublic |*/ BindingFlags.Instance | BindingFlags.Public)
 				.Where(prop => prop.DeclaringType != typeof(Component) )
 				.Where(prop => prop.CanRead && prop.CanWrite)
@@ -107,11 +107,6 @@ namespace Auto.Utils{
 
 		public object GetValue(MemberInfo info, object instance)
 		{
-	//      if(instance == null)
-			//{
-			//	return null;
-			//}
-
 			if (info as PropertyInfo != null)
 			{
 				PropertyInfo propInfo = (PropertyInfo)info;
@@ -181,7 +176,6 @@ namespace Auto.Utils{
 
 		public bool IsReferenceType(Type variableType)
 		{
-			//return variableType.IsPrimitive==false && variableType.IsClass;
 			return variableType.IsClass;
 		}
 
@@ -198,7 +192,6 @@ namespace Auto.Utils{
 		/// <returns></returns>
 		public bool IsCollectionType(Type variableType)
 		{
-			//return variableType.GetInterface("ICollection`1") != null || variableType.GetInterface("ICollection") != null;
 			return ImplementsInterface(variableType, "ICollection`1") || ImplementsInterface(variableType, "ICollection");
 		}
 
@@ -215,7 +208,7 @@ namespace Auto.Utils{
 				FieldInfo fieldInfo = (FieldInfo)info;
 				return fieldInfo.FieldType;
 			}
-			throw new Exception("Sorry, I could find out the Variable Type");
+			throw new Exception("Sorry, I couldn't find out the Variable Type");
 		}
 
 		#region Singles
@@ -382,8 +375,9 @@ namespace Auto.Utils{
 		#endregion
 
 		/// <summary>
-		/// Uses reflection to call a method in a class. It will aggressively search all method, and will be successful even if the method is a base private one.
-		/// This thing is really powerful. Use it sparingly.
+		/// Uses reflection to call a method in a class. It will aggressively search all methods, and will be successful even if the method is a private AND in a base/upper class.
+		/// This thing is really powerful. It is not cheap on performances, and is best only used for testing. It also breaks most OOP rules.
+		/// Use it sparingly
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="instance"></param>

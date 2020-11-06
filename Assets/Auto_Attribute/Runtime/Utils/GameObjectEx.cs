@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 using System;
 using System.Linq;
 using SceneManager = UnityEngine.SceneManagement.SceneManager;
@@ -163,7 +162,7 @@ namespace Auto.Utils{
 			do
 			{
 				result = go.GetComponent(componentType, true);
-				go = go.transform.parent.IfNotNull(p => p.gameObject);
+				go = go.transform?.parent.gameObject;
 			} while (result == null && go != null);
 
 			return result;

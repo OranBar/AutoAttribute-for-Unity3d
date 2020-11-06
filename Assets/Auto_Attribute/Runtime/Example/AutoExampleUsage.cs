@@ -1,13 +1,8 @@
-﻿//#define [GetComponent] [Auto]
-
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 public class AutoExampleUsage : MonoBehaviour {
 
-	
 	#region Single component Getters
 	[Auto] public AutoExampleUsage mySelf; //Same as GetComponent<TestTesta>() done in Awake 
 	[AutoParent] public AudioSource audioSource;	//Same as GetComponentInParent<AudioSource>() done in Awake
@@ -25,6 +20,9 @@ public class AutoExampleUsage : MonoBehaviour {
 
 	void Awake () {
 		firstCollider.isTrigger = true;	//The variable is already referenced when awake starts
+
 	}
+
+	
 	
 }
