@@ -7,7 +7,7 @@
  * 
  * public class Foo
  * {
- *		[AutoParent] public BoxCollier myBoxCollier;	//This assigns the variable to the BoxColider attached on your object
+ *		[AutoParent] public BoxCollier myBoxCollier;	//This assigns the variable to the BoxColider attached on your object's parent
  *		
  *		//Methods...
  * }
