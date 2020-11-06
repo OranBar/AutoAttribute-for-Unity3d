@@ -112,11 +112,6 @@ namespace Auto.Utils{
 
 		public static T GetComponent<T>(this GameObject go, bool includeInactiveObjects)
 		{
-			//if (includeInactiveObjects == false)
-			//{
-			//	Debug.LogError("Go to hell");
-			//}
-
 			if (go.activeSelf)
 			{
 				return go.GetComponent<T>();
@@ -133,7 +128,6 @@ namespace Auto.Utils{
 				{
 					result = (T)component;
 					break;
-					//return (T) component;
 				}
 			}
 
@@ -146,9 +140,8 @@ namespace Auto.Utils{
 			List<T> result = new List<T>();
 			foreach (var component in go.GetComponentsInChildren<T>(includeInactiveObjects))
 			{
-				//If a monoBehaviour is missing, the component can be null
-				if (component == null)
-				{ continue; }
+				//In case the monoBehaviour is missing, the component will be be null. 
+				if (component == null) { continue; }	
 
 
 				if (component.GameObject() != go)
