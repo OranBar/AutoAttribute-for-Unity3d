@@ -9,7 +9,7 @@
  * public class Foo
  * {
  *		[Auto] public BoxCollier myBoxCollier;	//This assigns the variable to the BoxColider attached on your object
- *		[Auto(true)] public Camera myCamera;	//since we passed true as an argument, if the camera is not found, Auto will log a warning as opposed to an error
+ *		[Auto(true)] public Camera myCamera;	//since we passed true as an argument, if the camera is not found, Auto will log a warning as opposed to an error, and won't halt the build.
  *		
  *		//[...]
  * }
