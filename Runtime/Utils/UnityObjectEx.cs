@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using System.Collections;
 using UnityEngine.Assertions;
 
 namespace Auto.Utils
@@ -14,8 +12,7 @@ namespace Auto.Utils
 		public static GameObject GameObject(this object o)
 		{
 			Assert.IsTrue(o is Component, "The argument is not a component. Its type is " + o.GetType());
-			//Component tmp = o as Component;
-			//return (tmp != null) ? tmp.gameObject : null;
+		
 			if ((Component)o == null)
 			{
 				return null;

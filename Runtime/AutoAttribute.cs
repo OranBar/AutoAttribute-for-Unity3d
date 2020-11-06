@@ -1,16 +1,18 @@
 ﻿/* Author: Oran Bar
  * Summary: This attribute automatically assigns a class variable to one of the gameobject's component. 
- * It basically acts as an automatic GetComponent on Awake.
- * Using [Auto(true)], the behaviour can be extendend to act like an AddOrGetComponent: The component will be added if it is not found, instead of an error being thrown.
+ * It acts as the equivalent of a GetComponent call done in Awake.
+ * Components that Auto has not been able to find are logged as errors in the console. 
+ * Using [Auto(true)], Auto will log warnings as opposed to errors. 
+ * This is important because, allowing Auto to log error will result in builds being halted whenever one of the [Auto] variables was unsuccessful.
  * 
- * usage example
+ * Usage example:
  * 
  * public class Foo
  * {
  *		[Auto] public BoxCollier myBoxCollier;	//This assigns the variable to the BoxColider attached on your object
- *		[Auto(true)] public Camera myCamera;	//If this GameObject has no camera, since we wrote (true), the component will be automayically added and referenced.
+ *		[Auto(true)] public Camera myCamera;	//since we passed true as an argument, if the camera is not found, Auto will log a warning as opposed to an error
  *		
- *		//Methods...
+ *		//[...]
  * }
  * 
  */

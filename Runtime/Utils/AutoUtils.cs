@@ -12,6 +12,7 @@ namespace Auto.Utils{
             return ienum.GetGenericArguments()[0];
         }
 		
+		// Credits to StackOverflow
 		private static Type FindIEnumerable(Type seqType)
 		{
 			if (seqType == null || seqType == typeof(string))

@@ -1,20 +1,21 @@
-﻿#define DEB
-
-/* Author: Oran Bar
+﻿/* Author: Oran Bar
  * Summary: 
  * 
  * This class executes the code to automatically set the references of the variables with the Auto attribute.
- * The code is executed at the beginning of the scene, before any other Awake has a chance to be executed.
+ * The code is executed at the beginning of the scene, 500 milliseconds before other Awake calls. (This is done using the ScriptTiming attribute, and can be changed manually)
  * Afterwards, all Auto variables will be assigned, and, in case of errors, [Auto] will log on the console with more info.
  
- * Don't be afraid of this little script. Apart from setting a few [Auto] variables, It's harmless. Let him live happly in your scene.
- * You'll learn to like him.
+ * AutoAttributeManager will sneak into your scene upon saving it. 
+ * Don't be afraid of this little script. Apart from setting a few [Auto] variables, It's harmless. 
+ * Let him live happly in your scene. You'll learn to like him.
  * 
- * The Define DEB on top of the script can be commented out to remove console logs. 
+ * If the #define DEB on top of this script is uncommented, Auto will log data about its performance in the console.
  * 
  * Copyrights to Oran Bar™
  */
 
+
+#define DEB
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,11 +23,10 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
 using Auto.Utils;
 
 
-[Auto.Utils.ScriptTiming(-1000)]
+[Auto.Utils.ScriptTiming(-500)]	
 public class AutoAttributeManager : MonoBehaviour
 {
 
@@ -55,8 +55,6 @@ public class AutoAttributeManager : MonoBehaviour
 			AutoReference(mb, out int successes, out int failures);
 			successfullyAssigments += successes;
 			failedAssignments += failures;
-			
-			Debug.Log("succ = "+successes);
 		}
 	}
 
@@ -138,7 +136,7 @@ public class AutoAttributeManager : MonoBehaviour
 			);
 
 		string result_color = (autoVarialbesNotAssigned_count > 0) ? "red" : "green";
-		Debug.LogFormat("[Auto] Assigned <color={5}><b>{4}/{2}</b></color> [Auto*] variables in <color=#cc3300><b>{3} Milliseconds </b></color> - Analized {0} MonoBehaviours and {1} variables", 
+		UnityEngine.Debug.LogFormat("[Auto] Assigned <color={5}><b>{4}/{2}</b></color> [Auto*] variables in <color=#cc3300><b>{3} Milliseconds </b></color> - Analized {0} MonoBehaviours and {1} variables", 
 			monoBehaviours.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds, autoVarialbesAssigned_count, autoVarialbesAssigned_count+autoVarialbesNotAssigned_count, result_color );
 #endif
 	}

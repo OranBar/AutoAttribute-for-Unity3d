@@ -1,9 +1,8 @@
 ﻿/* Author: Oran Bar
- * This class contains the shared code that the implementations of Auto will need
+ * This class contains the shared code for Auto attributes that fetch arrays of multiple components of the same type
  */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
