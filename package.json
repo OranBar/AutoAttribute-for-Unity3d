@@ -1,0 +1,24 @@
+{
+	"name": "barbaro.unity3d.auto",
+	"version": "3.0.0",
+	"displayName": "Auto Attribute",
+	"description": "This package provides [Auto], [AutoParent] and [AutoChildren] attributes. \nUsing those attributes, one can finally never again write a GetComponent line in an Awake function. \nUsing auto, getting your components is as simple as preprending the appropriate [Auto*] field to your variable declarations. \nAuto can be used with all access modifiers (private, protected, public), and all types (Unity components and custom monobehaviours). [AutoParent] and [AutoChildren] It can be used to get a single component, or get all the components. Multiple components can be returned as both an array, or a List. The variable type is inferred \nHere are a couple of examples: [Auto] public Rigidbody myRb; [AutoParent] protected Collider[] myParentsColliders; [AutoChildren] private CustomScript scriptInOneOfChildren;",
+	"unity": "2019.4",
+	"unityRelease": "6f1",
+	"dependencies": {
+	  
+   	},
+   "keywords": [
+	  "auto",
+	  "attribute",
+	  "utility",
+	  "tool",
+	  "development",
+	  "scripting"
+	],
+	"author": {
+	  "name": "Oran Bar",
+	  "email": "baroran@hormail.com",
+	  "url": "https://www.oranbar.com/wp"
+	}
+  }
