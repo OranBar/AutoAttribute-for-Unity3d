@@ -12,6 +12,7 @@
  * 
  * The Define DEB on top of the script can be commented out to remove console logs for performance.
  * 
+ * Copyrights to Oran Bar™
  */
 
 using System;
@@ -21,39 +22,51 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;	
+using Debug = UnityEngine.Debug;
 using Auto.Utils;
 
-#if UNITY_EDITOR
-[UnityEditor.InitializeOnLoad]
-#endif
-public static class AutoAttributeManager 
+
+[Auto.Utils.ScriptTiming(-1000)]
+public class AutoAttributeManager : MonoBehaviour
 {
 
-	#if UNITY_EDITOR
-	static AutoAttributeManager()
+	private void Awake()
 	{
-		UnityEditor.EditorApplication.playModeStateChanged += 
-			(playMode) => 
-			{ 
-				if(playMode == UnityEditor.PlayModeStateChange.ExitingEditMode)
-				{
-					SweeepScene();
-				}
-			};
+		// print("[Auto]: Start Scene Sweep");
+		SweeepScene();
+		// print("[Auto]: All Variables Referenced!");
 	}
-	#endif
 
 	public static void AutoReference(GameObject targetGo)
 	{
+		AutoReference(targetGo, out int succ, out int fail);
+	}
+
+	public static void AutoReference(MonoBehaviour mb)
+	{
+		AutoReference(mb, out int succ, out int fail);
+	}
+
+	public static void AutoReference(GameObject targetGo, out int successfullyAssigments, out int failedAssignments)
+	{
+		successfullyAssigments = 0;
+		failedAssignments = 0;
+
 		foreach(var mb in targetGo.GetComponents<MonoBehaviour>(true))
 		{
-			AutoReference(mb);
+			AutoReference(mb, out int succ, out int fail);
+			successfullyAssigments += succ;
+			Debug.Log("succ = "+succ);
+			
+			failedAssignments += fail;
 		}
 	}
 
-    public static void AutoReference(MonoBehaviour targetMb)
+    public static void AutoReference(MonoBehaviour targetMb, out int successfullyAssigments, out int failedAssignments)
 	{
+		successfullyAssigments = 0;
+		failedAssignments = 0;
+
 		//Fields
 		IEnumerable<FieldInfo> fields = GetFieldsWithAuto(targetMb);
 
@@ -61,8 +74,13 @@ public static class AutoAttributeManager
 		{
 			foreach (IAutoAttribute autofind in field.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				//var currentReferenceValue = field.GetValue(targetMb);
-				autofind.Execute(targetMb, field.FieldType, (mb, val)=>field.SetValue(mb, val));
+				var currentReferenceValue = field.GetValue(targetMb);
+				bool result = autofind.Execute(targetMb, field.FieldType, (mb, val)=>field.SetValue(mb, val));
+				if(result){
+					successfullyAssigments++;
+				}else{
+					failedAssignments++;
+				}
 			}
 		}
 
@@ -73,26 +91,29 @@ public static class AutoAttributeManager
 		{
 			foreach (IAutoAttribute autofind in prop.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				//var currentReferenceValue = prop.GetValue(targetMb, null);
-				autofind.Execute(targetMb, prop.PropertyType, (mb, val)=>prop.SetValue(mb, val));
+				var currentReferenceValue = prop.GetValue(targetMb, null);
+				bool result = autofind.Execute(targetMb, prop.PropertyType, (mb, val) => prop.SetValue(mb, val));
+				if(result){
+					successfullyAssigments++;
+				}else{
+					failedAssignments++;
+				}
 			}
 		}
 	}
 
-#if UNITY_EDITOR
-	[UnityEditor.Callbacks.PostProcessSceneAttribute(0)]
-#endif
     public static void SweeepScene()
 	{
 #if DEB
 		//Debug
-		Debug.Log("[Auto]: Start Scene Sweep");
 		Stopwatch sw = new Stopwatch();
 
 		sw.Start();
 		//////////////////
 #endif
-
+		int autoVarialbesAssigned_count = 0;
+		int autoVarialbesNotAssigned_count = 0;
+	
 		var activeScene = SceneManager.GetActiveScene();
 
 		IEnumerable<MonoBehaviour> monoBehaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>()
@@ -101,7 +122,9 @@ public static class AutoAttributeManager
 
 		foreach (var mb in monoBehaviours)
 		{
-			AutoReference(mb);
+			AutoReference(mb, out int succ, out int fail);
+			autoVarialbesAssigned_count += succ;
+			autoVarialbesNotAssigned_count += fail;
 		}
 
 #if DEB
@@ -120,9 +143,9 @@ public static class AutoAttributeManager
 			);
 
 		//Debug.Log("Elapsed "+sw.ElapsedMilliseconds+" milliseconds.");
-		Debug.LogFormat("[Auto] Scan Time - {3} Milliseconds. \nAnalized {0} MonoBehaviours and {1} variables. {2}/{1} variables had [Auto]", monoBehaviours.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds);
+		string result_color = (autoVarialbesNotAssigned_count > 0) ? "red" : "green";
+		Debug.LogFormat("[Auto] Assigned <color={5}><b>{4}/{2}</b></color> [Auto*] variables in <color=#cc3300><b>{3} Milliseconds </b></color> - Analized {0} MonoBehaviours and {1} variables", monoBehaviours.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds, autoVarialbesAssigned_count, autoVarialbesAssigned_count+autoVarialbesNotAssigned_count, result_color );
 		/////////////////////
-		Debug.Log("[Auto]: All Variables Referenced!");
 #endif
 	}
 

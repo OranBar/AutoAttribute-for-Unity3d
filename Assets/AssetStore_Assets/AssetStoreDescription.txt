@@ -1,0 +1,38 @@
+<strong># Auto Attributes<br></strong>
+<br>
+This package provides 3 attributes:<br>
+<em>[Auto]</em>, <em>[AutoParent]</em>, <em>[AutoChildren]</em><br>
+<br>
+
+
+- All variables with one of the three <em>[Auto*]</em> properties will automatically run a <b><em>GetComponent</em></b> call and set the value 
+- Auto will assign the variables BEFORE Awake is called
+- Auto will work on private variables
+- Auto will work on inactive objects
+- Auto can work on Instantiated objects: replace any call of Istantiate([..]) to this.Instantiate_And_AutoAssignVariables([..])
+- 
+
+Autos are field/property attributes that allow to automatically get/fetch components' references when the application is started. <br>
+This solution is presented as equivalent of having an Awake function containing GetComponent calls. <br>
+<br>
+It runs before all other Awakes (using script execution ordering), so whenever Awake starts execution, one can assume that no variable with Auto will throw a null exception.<br>
+If a component is not found, Auto will provide descriptive logging.<br>
+<br>
+[AutoParent] and [AutoChildren] can also be used on Array variables, and respectively have the same behaviour you would expect from a <em>T[] GetComponentsInParents()</em> or <em>T[] GetComponentsInChildren()</em> call. 
+  <br>
+Auto also works on inactive objects.<br>
+<br>
+Auto works by hooking into the awake function of a Manager monobehaviour script, which is automatically spawned in the scene whenever it is saved.<br>
+<br>
+<strong># Instantiation<br></strong>
+<br>
+In case of instantiated objects, please use the MonoBehaviour extension method <em>this.Instantiate_And_AutoAssignVariables()</em> to make sure Auto does the referencing before anyone else starts using that class<br>
+<br>
+<br>
+<strong># Requisites<br></strong>
+<br>
+All scripts using Auto must have their script execution order delay < 990.<br>
+<br>
+<strong># Installation<br></strong>
+<br>
+As soon as the package is installed, you can already start making use of the Auto Attributes!<br>

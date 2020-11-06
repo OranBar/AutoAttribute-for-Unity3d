@@ -24,17 +24,16 @@ public class AutoAttribute : Attribute, IAutoAttribute {
 
 	private const string MonoBehaviourNameColor = "green";
 
-	//TODO: I'd say always log error if missing. Change this bool to haltBuildIfNull. Change LogError to Log if this bool is false
-	private bool haltBuildIfNull = true;
+	private bool logError = true;
 
 	private Component targetComponent;
 
 	public AutoAttribute(bool haltBuildIfNull = true)
 	{
-		this.haltBuildIfNull = haltBuildIfNull;
+		this.logError = haltBuildIfNull;
 	}
 
-	public void Execute(MonoBehaviour mb, Type componentType, Action<MonoBehaviour, object> SetVariableType)
+	public bool Execute(MonoBehaviour mb, Type componentType, Action<MonoBehaviour, object> SetVariableType)
 	{
 		GameObject go = mb.gameObject;
 
@@ -44,7 +43,7 @@ public class AutoAttribute : Attribute, IAutoAttribute {
 			string errorMessage = string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}</color>",
 						componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor);
 					
-			if (haltBuildIfNull)
+			if (logError)
 			{
 				//Logging an error during PostProcessScene halts the build.
 				Debug.LogError(errorMessage, mb);
@@ -54,10 +53,12 @@ public class AutoAttribute : Attribute, IAutoAttribute {
 				Debug.LogWarning("<color=red>"+errorMessage+"</color>", mb);
 			}
 			
-			return;
+			return false;
 		}
 
 		SetVariableType(mb, componentToReference);
+		
+		return true;
 	}
 	
 }

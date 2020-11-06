@@ -12,6 +12,7 @@
  *		//Methods...
  * }
  * 
+ * Copyrights to Oran Bar™
  */
 
 using System;
@@ -26,38 +27,45 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 	private const string MonoBehaviourNameColor = "green";
 	private static ReflectionHelperMethods Rhm = new ReflectionHelperMethods();
 
-	private bool haltBuildIfNull = true;
+	private bool logErrorIfMissing = true;
 
 	private Component targetComponent;
 
 	public AutoFamily(bool getMadIfMissing = true)
 	{
-		this.haltBuildIfNull = getMadIfMissing;
+		this.logErrorIfMissing = getMadIfMissing;
 	}
 
-	public void Execute(MonoBehaviour mb, Type componentType, Action<MonoBehaviour, object> SetVariableType)
+	public bool Execute(MonoBehaviour mb, Type componentType, Action<MonoBehaviour, object> setVariable)
 	{
 		GameObject go = mb.gameObject;
 
-		if (componentType.IsArray || Rhm.IsList(componentType))
+		if(componentType.IsArray){
+			return AssignArray(mb, go, componentType, setVariable);
+		} else if (
+			// componentType.IsArray || 
+			Rhm.IsList(componentType))
 		{
-			MultipleComponentAssignment(mb, go, componentType, SetVariableType);
+			// MultipleComponentAssignment(mb, go, componentType, SetVariableType);
+
+			// return AssignList(mb, go, componentType, setVariable);
+			return false;
+
 		}
 		else
 		{
-			SetVariableType(mb, GetTheSingleComponent(mb, componentType));
+			setVariable(mb, GetTheSingleComponent(mb, componentType));
+			return true;
 		}
 	}
 
 	protected abstract object GetTheSingleComponent(MonoBehaviour mb, Type componentType);
 	protected abstract string GetMethodName();
 	
-	private void MultipleComponentAssignment(MonoBehaviour mb, GameObject go, Type componentType, Action<MonoBehaviour, object> SetVariable)
-	{
+	private object[] GetComponentsToReference(MonoBehaviour mb, GameObject go, Type componentType){
 		Type listElementType = AutoUtils.GetElementType(componentType);
 
 		MethodInfo method = typeof(GameObject).GetMethods()
-			//The next line would be similar to .Where(m => m.Name == "GetComponentsInChildren/InParent")
 			.First(m =>
 			{
 				bool result = true;
@@ -69,37 +77,44 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 			});
 		//we want to pass true as arg, to get from inactive objs too
 		MethodInfo generic = method.MakeGenericMethod(listElementType);
-		dynamic componentsToReference = generic.Invoke(go, new object[] { true });
+		//TODO: We know it's gonna be either an array or a list. We do not need to use dynamic, I think
+		object[] componentsToReference = generic.Invoke(go, new object[] { true }) as object[];
 
-		if (componentsToReference.Length == 0)
-		{
-			string errorMessage = string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find any components <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}.</color>",
-						componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor);
-
-			if (haltBuildIfNull)
-			{
-				//Logging an error during PostProcessScene halts the build.
-				Debug.LogError(errorMessage);
-			}
-			else
-			{
-				Debug.LogWarning("<color=red>"+errorMessage+"</color>");
-			}
-			return;
-
-		}
-			
-		if (componentType.IsArray)
-		{
-			SetVariable(mb, componentsToReference);
-		}
-		else if (Rhm.IsList(componentType))
-		{
-			SetVariable(mb, Enumerable.ToList(componentsToReference));
-		}
+		return componentsToReference;
 	}
 
-	
+	// private bool AssignList(MonoBehaviour mb, GameObject go, Type componentType, Action<MonoBehaviour, object> setVariable)
+	// {
+	// 	object[] componentsToReference = GetComponentsToReference(mb, go, componentType);
+
+	// 	if (logErrorIfMissing && componentsToReference.Length == 0){
+	// 		Debug.LogError(
+	// 			string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find any components <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}.</color>",
+	// 				componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor)
+	// 			, go);
+			
+	// 		return false;
+	// 	}
+
+	// 	setVariable(mb, Enumerable.ToList(componentsToReference.Select(obj => (componentType) obj  )));
+	// 	return true;
+	// }
+
+	private bool AssignArray(MonoBehaviour mb, GameObject go, Type componentType, Action<MonoBehaviour, object> setVariable)
+	{
+		object[] componentsToReference = GetComponentsToReference(mb, go, componentType);
+
+		if (logErrorIfMissing && componentsToReference.Length == 0)	{
+			Debug.LogError(
+				string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find any components <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}.</color>",
+					componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor)
+				, go);
+			return false;
+		}
+
+		setVariable(mb, componentsToReference);
+		return true;
+	}
 }
 
 public static class AutoUtils
