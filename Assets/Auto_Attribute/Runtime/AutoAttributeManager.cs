@@ -4,13 +4,13 @@
  * Summary: 
  * 
  * This class executes the code to automatically set the references of the variables with the Auto attribute.
- * The code is executed at the beginning of the scene, before Any other Awake has a chance to be executed.
+ * The code is executed at the beginning of the scene, before any other Awake has a chance to be executed.
  * Afterwards, all Auto variables will be assigned, and, in case of errors, [Auto] will log on the console with more info.
  
  * Don't be afraid of this little script. Apart from setting a few [Auto] variables, It's harmless. Let him live happly in your scene.
  * You'll learn to like him.
  * 
- * The Define DEB on top of the script can be commented out to remove console logs for performance.
+ * The Define DEB on top of the script can be commented out to remove console logs. 
  * 
  * Copyrights to Oran Bar™
  */
@@ -32,9 +32,7 @@ public class AutoAttributeManager : MonoBehaviour
 
 	private void Awake()
 	{
-		// print("[Auto]: Start Scene Sweep");
 		SweeepScene();
-		// print("[Auto]: All Variables Referenced!");
 	}
 
 	public static void AutoReference(GameObject targetGo)
@@ -54,11 +52,11 @@ public class AutoAttributeManager : MonoBehaviour
 
 		foreach(var mb in targetGo.GetComponents<MonoBehaviour>(true))
 		{
-			AutoReference(mb, out int succ, out int fail);
-			successfullyAssigments += succ;
-			Debug.Log("succ = "+succ);
+			AutoReference(mb, out int successes, out int failures);
+			successfullyAssigments += successes;
+			failedAssignments += failures;
 			
-			failedAssignments += fail;
+			Debug.Log("succ = "+successes);
 		}
 	}
 
@@ -72,10 +70,10 @@ public class AutoAttributeManager : MonoBehaviour
 
 		foreach (var field in fields)
 		{
-			foreach (IAutoAttribute autofind in field.GetCustomAttributes(typeof(IAutoAttribute), true))
+			foreach (IAutoAttribute autoAttribute in field.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				var currentReferenceValue = field.GetValue(targetMb);
-				bool result = autofind.Execute(targetMb, field.FieldType, (mb, val)=>field.SetValue(mb, val));
+				// var currentReferenceValue = field.GetValue(targetMb);
+				bool result = autoAttribute.Execute(targetMb, field.FieldType, (mb, val) => field.SetValue(mb, val));
 				if(result){
 					successfullyAssigments++;
 				}else{
@@ -91,7 +89,7 @@ public class AutoAttributeManager : MonoBehaviour
 		{
 			foreach (IAutoAttribute autofind in prop.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				var currentReferenceValue = prop.GetValue(targetMb, null);
+				// var currentReferenceValue = prop.GetValue(targetMb, null);
 				bool result = autofind.Execute(targetMb, prop.PropertyType, (mb, val) => prop.SetValue(mb, val));
 				if(result){
 					successfullyAssigments++;
@@ -105,11 +103,9 @@ public class AutoAttributeManager : MonoBehaviour
     public static void SweeepScene()
 	{
 #if DEB
-		//Debug
 		Stopwatch sw = new Stopwatch();
 
 		sw.Start();
-		//////////////////
 #endif
 		int autoVarialbesAssigned_count = 0;
 		int autoVarialbesNotAssigned_count = 0;
@@ -128,7 +124,6 @@ public class AutoAttributeManager : MonoBehaviour
 		}
 
 #if DEB
-		//Debug
 		sw.Stop();
 
 		int variablesAnalized = monoBehaviours
@@ -142,10 +137,9 @@ public class AutoAttributeManager : MonoBehaviour
 				agg = agg + GetFieldsWithAuto(mb).Count() + GetPropertiesWithAuto(mb).Count()
 			);
 
-		//Debug.Log("Elapsed "+sw.ElapsedMilliseconds+" milliseconds.");
 		string result_color = (autoVarialbesNotAssigned_count > 0) ? "red" : "green";
-		Debug.LogFormat("[Auto] Assigned <color={5}><b>{4}/{2}</b></color> [Auto*] variables in <color=#cc3300><b>{3} Milliseconds </b></color> - Analized {0} MonoBehaviours and {1} variables", monoBehaviours.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds, autoVarialbesAssigned_count, autoVarialbesAssigned_count+autoVarialbesNotAssigned_count, result_color );
-		/////////////////////
+		Debug.LogFormat("[Auto] Assigned <color={5}><b>{4}/{2}</b></color> [Auto*] variables in <color=#cc3300><b>{3} Milliseconds </b></color> - Analized {0} MonoBehaviours and {1} variables", 
+			monoBehaviours.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds, autoVarialbesAssigned_count, autoVarialbesAssigned_count+autoVarialbesNotAssigned_count, result_color );
 #endif
 	}
 
@@ -178,15 +172,15 @@ public class AutoAttributeManager : MonoBehaviour
 			.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
 			.Where(prop => prop.PropertyType.IsClass)
 			.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
-						Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
-						Attribute.IsDefined(prop, typeof(AutoParentAttribute))
+					Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
+					Attribute.IsDefined(prop, typeof(AutoParentAttribute))
 			)
 			.Concat(
 				rhm.GetNonPublicPropertiesInBaseClasses(mb.GetType())
 				.Where(prop => prop.PropertyType.IsClass)
 				.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
-							Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
-							Attribute.IsDefined(prop, typeof(AutoParentAttribute))
+						Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
+						Attribute.IsDefined(prop, typeof(AutoParentAttribute))
 				)
 			);
 	}
