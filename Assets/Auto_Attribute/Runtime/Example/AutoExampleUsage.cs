@@ -14,8 +14,8 @@ public class AutoExampleUsage : MonoBehaviour {
 	#endregion
 	
 	#region Optional Parameters - Logging
-	[Auto(true)] private CanvasGroup canvas1;	//Passing true as parameter will log an error if the component was not found. This is the default
-	[Auto(false)] public CanvasGroup canvas2;		//Passing false as parameter will log a warning if the component was not found. 
+	[Auto(true)] private CanvasGroup canvas1;	//Passing true as parameter will log an error if the component was not found. This is the default, and builds will be halted with Auto is unsuccessful
+	[Auto(false)] public CanvasGroup canvas2;		//Passing false as parameter will log a warning if the component was not found. Builds will not be halted by Auto
 	#endregion
 
 	void Awake () {

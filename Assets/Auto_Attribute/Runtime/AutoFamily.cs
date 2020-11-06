@@ -29,13 +29,11 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 		if(componentType.IsArray){
 			return AssignArray(mb, go, componentType, setVariable);
 		} else if (
-			// componentType.IsArray || 
 			Rhm.IsList(componentType))
 		{
-			// MultipleComponentAssignment(mb, go, componentType, SetVariableType);
-			// return AssignList(mb, go, componentType, setVariable);
+			// Can't handle lists without using dynamic keyword. 
+			// Arrays will have to be enough.
 			return false;
-
 		}
 		else
 		{
@@ -62,7 +60,6 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 			});
 		//we want to pass true as arg, to get from inactive objs too
 		MethodInfo generic = method.MakeGenericMethod(listElementType);
-		//TODO: We know it's gonna be either an array or a list. We do not need to use dynamic, I think
 		object[] componentsToReference = generic.Invoke(go, new object[] { true }) as object[];
 
 		return componentsToReference;
@@ -84,69 +81,5 @@ public abstract class AutoFamily : Attribute, IAutoAttribute
 		return true;
 	}
 
-	// private bool AssignList(MonoBehaviour mb, GameObject go, Type componentType, Action<MonoBehaviour, object> setVariable)
-	// {
-	// 	object[] componentsToReference = GetComponentsToReference(mb, go, componentType);
-
-	// 	if (logErrorIfMissing && componentsToReference.Length == 0){
-	// 		Debug.LogError(
-	// 			string.Format("[Auto]: <color={3}><b>{1}</b></color> couldn't find any components <color=#cc3300><b>{0}</b></color> on <color=#e68a00>{2}.</color>",
-	// 				componentType.Name, mb.GetType().Name, go.name, MonoBehaviourNameColor)
-	// 			, go);
-			
-	// 		return false;
-	// 	}
-
-	// 	setVariable(mb, Enumerable.ToList(componentsToReference.Select(obj => (componentType) obj  )));
-	// 	return true;
-	// }
 
 }
-
-// public static class AutoUtils
-// {
-
-// 	internal static Type GetElementType(Type seqType)
-// 	{
-// 		Type ienum = FindIEnumerable(seqType);
-// 		if (ienum == null) return seqType;
-// 		return ienum.GetGenericArguments()[0];
-// 	}
-
-// 	private static Type FindIEnumerable(Type seqType)
-// 	{
-// 		if (seqType == null || seqType == typeof(string)){
-// 			return null;
-// 		}
-// 		if (seqType.IsArray){
-// 			return typeof(IEnumerable<>).MakeGenericType(seqType.GetElementType());
-// 		}
-// 		if (seqType.IsGenericType)
-// 		{
-// 			foreach (Type arg in seqType.GetGenericArguments())
-// 			{
-// 				Type ienum = typeof(IEnumerable<>).MakeGenericType(arg);
-// 				if (ienum.IsAssignableFrom(seqType))
-// 				{
-// 					return ienum;
-// 				}
-// 			}
-// 		}
-
-// 		Type[] ifaces = seqType.GetInterfaces();
-// 		if (ifaces != null && ifaces.Length > 0)
-// 		{
-// 			foreach (Type iface in ifaces)
-// 			{
-// 				Type ienum = FindIEnumerable(iface);
-// 				if (ienum != null) return ienum;
-// 			}
-// 		}
-// 		if (seqType.BaseType != null && seqType.BaseType != typeof(object))
-// 		{
-// 			return FindIEnumerable(seqType.BaseType);
-// 		}
-// 		return null;
-// 	}
-
-// }
