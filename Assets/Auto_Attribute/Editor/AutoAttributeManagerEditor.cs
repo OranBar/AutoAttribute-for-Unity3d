@@ -5,6 +5,9 @@ using UnityEditor.SceneManagement;
 [InitializeOnLoad]
 public class AutoAttributeManagerEditor : UnityEditor.AssetModificationProcessor
 {
+	static AutoAttributeManagerEditor(){
+	}
+
 	private static void MakeSureAutoManagerIsInScene()
 	{
 		var autoManagers = GameObject.FindObjectsOfType<AutoAttributeManager>();
@@ -27,6 +30,8 @@ public class AutoAttributeManagerEditor : UnityEditor.AssetModificationProcessor
 	public static string[] OnWillSaveAssets(string[] paths)
 	{
 		MakeSureAutoManagerIsInScene();
+		var autoManager = GameObject.FindObjectOfType<AutoAttributeManager>();
+		autoManager.CacheMonobehavioursWithAuto();
 		return paths;
 	}
 }
