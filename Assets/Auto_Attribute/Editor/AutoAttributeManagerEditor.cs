@@ -31,7 +31,7 @@ public class AutoAttributeManagerEditor : UnityEditor.AssetModificationProcessor
 	{
 		MakeSureAutoManagerIsInScene();
 		var autoManager = GameObject.FindObjectOfType<AutoAttributeManager>();
-		autoManager.CacheMonobehavioursWithAuto();
+		// autoManager.CacheMonobehavioursWithAuto();
 		return paths;
 	}
 }

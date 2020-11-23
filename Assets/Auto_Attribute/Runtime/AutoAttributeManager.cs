@@ -25,29 +25,28 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Auto.Utils;
 
-
 [Auto.Utils.ScriptTiming(-500)]	
-public class AutoAttributeManager : MonoBehaviour
+public class AutoAttributeManager : Singleton<AutoAttributeManager>
 {
 
 	[SerializeField] private List<MonoBehaviour> monoBehavioursInSceneWithAuto;
 
-	private void Awake()
+	protected override void InitTon()
 	{
 		SweeepScene();
 	}
 
-	public static void AutoReference(GameObject targetGo)
+	public void AutoReference(GameObject targetGo)
 	{
 		AutoReference(targetGo, out int succ, out int fail);
 	}
 
-	public static void AutoReference(MonoBehaviour mb)
+	public void AutoReference(MonoBehaviour mb)
 	{
 		AutoReference(mb, out int succ, out int fail);
 	}
 
-	public static void AutoReference(GameObject targetGo, out int successfullyAssigments, out int failedAssignments)
+	public void AutoReference(GameObject targetGo, out int successfullyAssigments, out int failedAssignments)
 	{
 		successfullyAssigments = 0;
 		failedAssignments = 0;
@@ -60,7 +59,8 @@ public class AutoAttributeManager : MonoBehaviour
 		}
 	}
 
-    public static void AutoReference(MonoBehaviour targetMb, out int successfullyAssigments, out int failedAssignments)
+
+	public void AutoReference(MonoBehaviour targetMb, out int successfullyAssigments, out int failedAssignments)
 	{
 		successfullyAssigments = 0;
 		failedAssignments = 0;
@@ -107,13 +107,7 @@ public class AutoAttributeManager : MonoBehaviour
 
 		sw.Start();
 #endif
-		IEnumerable<MonoBehaviour> monoBehaviours = null;
-		if(monoBehavioursInSceneWithAuto?.Any() != true){
-			//Fallback if, for some reason, the monobehaviours were not previously cached
-			monoBehaviours = GetAllMonobehavioursWithAuto();
-		} else {
-			monoBehaviours = monoBehavioursInSceneWithAuto;
-		}
+		IEnumerable<MonoBehaviour> monoBehaviours = GetAllMonobehavioursWithAuto();
 
 		int autoVarialbesAssigned_count = 0;
 		int autoVarialbesNotAssigned_count = 0;
@@ -127,6 +121,7 @@ public class AutoAttributeManager : MonoBehaviour
 
 #if DEB
 		sw.Stop();
+
 
 		int variablesAnalized = monoBehaviours
 			.Select(mb => mb.GetType())
@@ -151,13 +146,13 @@ public class AutoAttributeManager : MonoBehaviour
 		UnityEngine.Debug.Log($"Cached {monoBehavioursInSceneWithAuto.Count} MonoBehaviours in {Time.time - start} mills");
 	}
 
-	private static IEnumerable<MonoBehaviour> GetAllMonobehavioursWithAuto(){
+	private IEnumerable<MonoBehaviour> GetAllMonobehavioursWithAuto(){
 		var activeScene = SceneManager.GetActiveScene();
 
 		IEnumerable<MonoBehaviour> monoBehaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>()
-			.Where(mb => mb.gameObject.scene == activeScene);
-
-		monoBehaviours = monoBehaviours.Where(mb => GetFieldsWithAuto(mb).Count() + GetPropertiesWithAuto(mb).Count() > 0);
+			.Where(mb => mb.gameObject.scene == activeScene)
+			.Where(mb1 => GetFieldsWithAuto(mb1).Count() + GetPropertiesWithAuto(mb1).Count() > 0);
+		
 
 		return monoBehaviours;
 	}
@@ -183,7 +178,7 @@ public class AutoAttributeManager : MonoBehaviour
 			); 
 	}
 
-	private static IEnumerable<PropertyInfo> GetPropertiesWithAuto(MonoBehaviour mb)
+	private IEnumerable<PropertyInfo> GetPropertiesWithAuto(MonoBehaviour mb)
 	{
 		ReflectionHelperMethods rhm = new ReflectionHelperMethods();
 
