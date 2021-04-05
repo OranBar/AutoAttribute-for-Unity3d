@@ -167,7 +167,7 @@ public class AutoAttributeManager : MonoBehaviour
 		ReflectionHelperMethods rhm = new ReflectionHelperMethods();
 
 		return mb.GetType()
-			.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
+			.GetFields(BindingFlags.Instance | BindingFlags.Public)
 			.Where(prop => prop.FieldType.IsClass)
 			.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 								Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
@@ -188,7 +188,7 @@ public class AutoAttributeManager : MonoBehaviour
 		ReflectionHelperMethods rhm = new ReflectionHelperMethods();
 
 		return mb.GetType()
-			.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
+			.GetProperties(BindingFlags.Instance | BindingFlags.Public)
 			.Where(prop => prop.PropertyType.IsClass)
 			.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 					Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
