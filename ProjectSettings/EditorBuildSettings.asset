@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Auto_Attribute/Tests/Runtime/example-scene 1.unity
+    guid: a4246202650c8e546bfdcf94c045b840
+  - enabled: 1
+    path: Assets/Auto_Attribute/Tests/Runtime/example-scene 2.unity
+    guid: a888c0b1d9ffe644d913e127184cd549
+  - enabled: 1
+    path: Assets/Auto_Attribute/Tests/Runtime/example-scene.unity
+    guid: 9e246aa9f6ad69146bcbe7ff2b559155
   m_configObjects: {}

@@ -21,9 +21,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Auto.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Auto.Utils;
 
 
 [Auto.Utils.ScriptTiming(-500)]	
@@ -145,17 +145,16 @@ public class AutoAttributeManager : MonoBehaviour
 #endif
 	}
 
-	public void CacheMonobehavioursWithAuto(){
-		var start = Time.time;
-		monoBehavioursInSceneWithAuto = GetAllMonobehavioursWithAuto().ToList();
-		UnityEngine.Debug.Log($"Cached {monoBehavioursInSceneWithAuto.Count} MonoBehaviours in {Time.time - start} mills");
-	}
+	// public void CacheMonobehavioursWithAuto(){
+	// 	var start = Time.time;
+	// 	monoBehavioursInSceneWithAuto = GetAllMonobehavioursWithAuto().ToList();
+	// 	UnityEngine.Debug.Log($"Cached {monoBehavioursInSceneWithAuto.Count} MonoBehaviours in {Time.time - start} mills");
+	// }
 
-	private static IEnumerable<MonoBehaviour> GetAllMonobehavioursWithAuto(){
-		var activeScene = SceneManager.GetActiveScene();
-
-		IEnumerable<MonoBehaviour> monoBehaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>()
-			.Where(mb => mb.gameObject.scene == activeScene);
+	private IEnumerable<MonoBehaviour> GetAllMonobehavioursWithAuto(){
+		
+		IEnumerable<MonoBehaviour> monoBehaviours = GameObject.FindObjectsOfType<MonoBehaviour>(true)
+				.Where(mb => mb.gameObject.scene == this.gameObject.scene);
 
 		monoBehaviours = monoBehaviours.Where(mb => GetFieldsWithAuto(mb).Count() + GetPropertiesWithAuto(mb).Count() > 0);
 
