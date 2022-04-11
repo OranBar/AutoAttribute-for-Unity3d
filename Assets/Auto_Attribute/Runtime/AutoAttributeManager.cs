@@ -30,6 +30,8 @@ using Auto.Utils;
 public class AutoAttributeManager : MonoBehaviour
 {
 
+	[SerializeField] private List<MonoBehaviour> monoBehavioursInSceneWithAuto;
+
 	private void Awake()
 	{
 		SweeepScene();
@@ -98,21 +100,23 @@ public class AutoAttributeManager : MonoBehaviour
 		}
 	}
 
-    public static void SweeepScene()
+    public void SweeepScene()
 	{
 #if DEB
 		Stopwatch sw = new Stopwatch();
 
 		sw.Start();
 #endif
+		IEnumerable<MonoBehaviour> monoBehaviours = null;
+		if(monoBehavioursInSceneWithAuto?.Any() != true){
+			//Fallback if, for some reason, the monobehaviours were not previously cached
+			monoBehaviours = GetAllMonobehavioursWithAuto();
+		} else {
+			monoBehaviours = monoBehavioursInSceneWithAuto;
+		}
+
 		int autoVarialbesAssigned_count = 0;
 		int autoVarialbesNotAssigned_count = 0;
-	
-		var activeScene = SceneManager.GetActiveScene();
-
-		IEnumerable<MonoBehaviour> monoBehaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>()
-			.Where(mb => mb.gameObject.scene == activeScene);
-
 
 		foreach (var mb in monoBehaviours)
 		{
@@ -136,9 +140,26 @@ public class AutoAttributeManager : MonoBehaviour
 			);
 
 		string result_color = (autoVarialbesNotAssigned_count > 0) ? "red" : "green";
-		UnityEngine.Debug.LogFormat("[Auto] Assigned <color={5}><b>{4}/{2}</b></color> [Auto*] variables in <color=#cc3300><b>{3} Milliseconds </b></color> - Analized {0} MonoBehaviours and {1} variables", 
-			monoBehaviours.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds, autoVarialbesAssigned_count, autoVarialbesAssigned_count+autoVarialbesNotAssigned_count, result_color );
+		UnityEngine.Debug.LogFormat("[Auto] Assigned <color={5}><b>{4}/{2}</b></color> [Auto*] variables in <color=#cc3300><b>{3} Milliseconds </b></color> - Analized {0} MonoBehaviours and {1} variables",
+			monoBehavioursInSceneWithAuto.Count(), variablesAnalized, variablesWithAuto, sw.ElapsedMilliseconds, autoVarialbesAssigned_count, autoVarialbesAssigned_count+autoVarialbesNotAssigned_count, result_color );
 #endif
+	}
+
+	public void CacheMonobehavioursWithAuto(){
+		var start = Time.time;
+		monoBehavioursInSceneWithAuto = GetAllMonobehavioursWithAuto().ToList();
+		UnityEngine.Debug.Log($"Cached {monoBehavioursInSceneWithAuto.Count} MonoBehaviours in {Time.time - start} mills");
+	}
+
+	private static IEnumerable<MonoBehaviour> GetAllMonobehavioursWithAuto(){
+		var activeScene = SceneManager.GetActiveScene();
+
+		IEnumerable<MonoBehaviour> monoBehaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>()
+			.Where(mb => mb.gameObject.scene == activeScene);
+
+		monoBehaviours = monoBehaviours.Where(mb => GetFieldsWithAuto(mb).Count() + GetPropertiesWithAuto(mb).Count() > 0);
+
+		return monoBehaviours;
 	}
 
 	private static IEnumerable<FieldInfo> GetFieldsWithAuto(MonoBehaviour mb)
@@ -146,7 +167,7 @@ public class AutoAttributeManager : MonoBehaviour
 		ReflectionHelperMethods rhm = new ReflectionHelperMethods();
 
 		return mb.GetType()
-			.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
+			.GetFields(BindingFlags.Instance | BindingFlags.Public)
 			.Where(prop => prop.FieldType.IsClass)
 			.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 								Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
@@ -167,7 +188,7 @@ public class AutoAttributeManager : MonoBehaviour
 		ReflectionHelperMethods rhm = new ReflectionHelperMethods();
 
 		return mb.GetType()
-			.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)
+			.GetProperties(BindingFlags.Instance | BindingFlags.Public)
 			.Where(prop => prop.PropertyType.IsClass)
 			.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 					Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
