@@ -19,14 +19,10 @@ Auto works by hooking into the awake function of a Manager monobehaviour script,
 
 # Instantiation
 
-In case of instantiated objects, please use the MonoBehaviour extension method "this.Instantiate_And_AutoAssignVariables()" to make sure Auto does the referencing before anyone else starts using that class
+In case of instantiated objects, attach the component AutoReferencerOnInstantiation to the prefab/gameobject prior to the instantiation to make sure Auto does the referencing before anyone else starts using that class
 
-
-# Requisites
-
-All scripts using Auto must have their script execution order delay < 990.
 
 # Installation
 
-As soon as the package is install, you can already make use of the Auto Attributes!
+As soon as the package is installed, you can already make use of the Auto Attributes!
 
