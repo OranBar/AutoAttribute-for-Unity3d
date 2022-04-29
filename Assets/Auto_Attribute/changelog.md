@@ -1,3 +1,6 @@
+v2.5.2
+- Added support for Additive scenes 
+
 v2.4.0 
 - Project ufficially becomes a package
 - Updated Auto to Unity 2019.4
