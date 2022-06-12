@@ -30,7 +30,7 @@ using UnityEngine.SceneManagement;
 public class AutoAttributeManager : MonoBehaviour
 {
 
-	[SerializeField] private List<MonoBehaviour> monoBehavioursInSceneWithAuto;
+	private List<MonoBehaviour> monoBehavioursInSceneWithAuto = new List<MonoBehaviour>();
 
 	private void Awake()
 	{
@@ -39,23 +39,23 @@ public class AutoAttributeManager : MonoBehaviour
 
 	public static void AutoReference(GameObject targetGo)
 	{
-		AutoReference(targetGo, out int succ, out int fail);
+		AutoReference(targetGo, out _, out _);
 	}
 
 	public static void AutoReference(MonoBehaviour mb)
 	{
-		AutoReference(mb, out int succ, out int fail);
+		AutoReference(mb, out _, out _);
 	}
 
-	public static void AutoReference(GameObject targetGo, out int successfullyAssigments, out int failedAssignments)
+	public static void AutoReference(GameObject targetGo, out int successfulAssigments, out int failedAssignments)
 	{
-		successfullyAssigments = 0;
+		successfulAssigments = 0;
 		failedAssignments = 0;
 
 		foreach(var mb in targetGo.GetComponents<MonoBehaviour>(true))
 		{
 			AutoReference(mb, out int successes, out int failures);
-			successfullyAssigments += successes;
+			successfulAssigments += successes;
 			failedAssignments += failures;
 		}
 	}
@@ -72,7 +72,6 @@ public class AutoAttributeManager : MonoBehaviour
 		{
 			foreach (IAutoAttribute autoAttribute in field.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				// var currentReferenceValue = field.GetValue(targetMb);
 				bool result = autoAttribute.Execute(targetMb, field.FieldType, (mb, val) => field.SetValue(mb, val));
 				if(result){
 					successfullyAssigments++;
@@ -89,7 +88,6 @@ public class AutoAttributeManager : MonoBehaviour
 		{
 			foreach (IAutoAttribute autofind in prop.GetCustomAttributes(typeof(IAutoAttribute), true))
 			{
-				// var currentReferenceValue = prop.GetValue(targetMb, null);
 				bool result = autofind.Execute(targetMb, prop.PropertyType, (mb, val) => prop.SetValue(mb, val));
 				if(result){
 					successfullyAssigments++;
@@ -167,14 +165,14 @@ public class AutoAttributeManager : MonoBehaviour
 
 		return mb.GetType()
 			.GetFields(BindingFlags.Instance | BindingFlags.Public)
-			.Where(prop => prop.FieldType.IsClass)
+			.Where(prop => prop.FieldType.IsPrimitive == false)
 			.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 								Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
 								Attribute.IsDefined(prop, typeof(AutoParentAttribute))
 			)
 			.Concat(
 				rhm.GetNonPublicFieldsInBaseClasses(mb.GetType())
-				.Where(prop => prop.FieldType.IsClass)
+				.Where(prop => prop.FieldType.IsPrimitive == false)
 				.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 								Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
 								Attribute.IsDefined(prop, typeof(AutoParentAttribute))
@@ -188,14 +186,14 @@ public class AutoAttributeManager : MonoBehaviour
 
 		return mb.GetType()
 			.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-			.Where(prop => prop.PropertyType.IsClass)
+			.Where(prop => prop.PropertyType.IsPrimitive == false)
 			.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 					Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
 					Attribute.IsDefined(prop, typeof(AutoParentAttribute))
 			)
 			.Concat(
 				rhm.GetNonPublicPropertiesInBaseClasses(mb.GetType())
-				.Where(prop => prop.PropertyType.IsClass)
+				.Where(prop => prop.PropertyType.IsPrimitive == false)
 				.Where(prop => Attribute.IsDefined(prop, typeof(AutoAttribute)) ||
 						Attribute.IsDefined(prop, typeof(AutoChildrenAttribute)) ||
 						Attribute.IsDefined(prop, typeof(AutoParentAttribute))
