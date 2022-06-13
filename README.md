@@ -23,10 +23,17 @@ The manager is automatically spawned whenever the scene whenever it is saved.
 In case of instantiated objects, attach the component AutoReferencer_OnInstantiation to the object that will be instantiated.
 This object will run its awake before any other component, requesting the Manager to reference the variables with the Auto attribute. 
 
+# AddComponent
+
+Unfortunately, there is no easy and performant way to know when a component was added to a script.
+Becuase of that, Auto has a hard time dealing with an AddComponent<T> call.
+If you need to do an AddComponent of a class that has variables with the [Auto*] attribute, Auto provides an extension method for MonoBehaviour scripts:
+AddComponent_Auto<T>().
+Calling this function, will make sure that the component is AutoReferences immediately after it was added.
 
 # Requisites
 
-All scripts using Auto must have their script execution order delay > -500.
+All scripts using Auto must have their script execution order delay > -500 (This is the value used by the Auto scripts).
 
 # Installation
 
