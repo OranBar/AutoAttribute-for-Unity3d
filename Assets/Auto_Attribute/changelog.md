@@ -1,5 +1,7 @@
 v2.5.4
 - Fixed bug where Auto would not work on interfaces and abstract classes
+- Updated Readme
+- Added AddComponent_Auto<T> extension methods
 
 v2.5.3
 - Removed some classes that were used for testing
