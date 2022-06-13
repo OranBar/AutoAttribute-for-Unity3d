@@ -37,4 +37,19 @@ All scripts using Auto must have their script execution order delay > -500 (This
 
 # Installation
 
+### Method 1:
+Add this line to the manifest.json file located in the Packages folder
+
+	"barbaro.unity3d.auto": "https://github.com/OranBar/AutoAttribute-for-Unity3d.git?path=Assets/Auto_Attribute"
+
+### Method 2:
+Open the package manager, and select "Add package from git URL".
+Paste this string as the URL:
+
+	https://github.com/OranBar/AutoAttribute-for-Unity3d.git?path=Assets/Auto_Attribute
+
+### Method 3: 
+From the Releases page, download the unitypackage file, and import it in your project. 
+
 As soon as the package is installed, you can already make use of the Auto Attributes!
+If you're using Assembly Definitions, remember to reference Auto's Assembly Definition **BarbarO.AutoAttributes.Runtime**.
